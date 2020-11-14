@@ -54,6 +54,7 @@ static bool is_valid_name (const char *name)
 		return true;
 	}
 
+#if 0
 	/*
 	 * User/group names must match [a-z_][a-z0-9_-]*[$]
 	 */
@@ -73,6 +74,26 @@ static bool is_valid_name (const char *name)
 			return false;
 		}
 	}
+#endif
+	/*
+	 * POSIX indicate that usernames are composed of characters from the
+	 * portable filename character set [A-Za-z0-9._-], and that the hyphen
+	 * should not be used as the first character of a portable user name.
+	 *
+	 * Allow more relaxed user/group names in Debian -- ^[^-~+:,\s][^:,\s]*$
+	 */
+	if (   ('\0' == *name)
+	    || ('-'  == *name)
+	    || ('~'  == *name)
+	    || ('+'  == *name)) {
+		return false;
+	}
+	do {
+		if ((':' == *name) || (',' == *name) || isspace(*name)) {
+			return false;
+		}
+		name++;
+	} while ('\0' != *name);
 
 	return true;
 }

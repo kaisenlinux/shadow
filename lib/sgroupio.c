@@ -229,7 +229,7 @@ static struct commonio_db gshadow_db = {
 #ifdef WITH_SELINUX
 	NULL,			/* scontext */
 #endif
-	0400,                   /* st_mode */
+	0440,                   /* st_mode */
 	0,                      /* st_uid */
 	0,                      /* st_gid */
 	NULL,			/* head */

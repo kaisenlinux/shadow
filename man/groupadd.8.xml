@@ -273,10 +273,16 @@
    <refsect1 id='caveats'>
      <title>CAVEATS</title>
      <para>
-       Groupnames must start with a lower case letter or an underscore,
+       It is usually recommended to only use groupnames that begin with a lower case letter or an underscore,
        followed by lower case letters, digits, underscores, or dashes.
        They can end with a dollar sign.
        In regular expression terms: [a-z_][a-z0-9_-]*[$]?
+     </para>
+     <para>
+       On Debian, the only constraints are that groupnames must neither start
+       with a dash ('-') nor plus ('+') nor tilde ('~') nor contain a
+       colon (':'), a comma (','), or a whitespace (space:' ',
+       end of line: '\n', tabulation: '\t', etc.).
      </para>
      <para>
        Groupnames may only be up to &GROUP_NAME_MAX_LENGTH; characters long.

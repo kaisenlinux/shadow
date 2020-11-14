@@ -1,0 +1,22 @@
+Author: Kevin Chevreuil - Kaisen <kaisen@kaisen-linux.org>
+
+--- shadow-4.8.1-1.orig/etc/login.defs
++++ shadow-4.8.1-1/etc/login.defs
+@@ -236,7 +236,7 @@ CRACKLIB_DICTPATH	/var/cache/cracklib/cr
+ # Min/max values for automatic uid selection in useradd(8)
+ #
+ UID_MIN			 1000
+-UID_MAX			60000
++UID_MAX			 1030
+ # System accounts
+ SYS_UID_MIN		  101
+ SYS_UID_MAX		  999
+@@ -249,7 +249,7 @@ SUB_UID_COUNT		    65536
+ # Min/max values for automatic gid selection in groupadd(8)
+ #
+ GID_MIN			 1000
+-GID_MAX			60000
++GID_MAX			 1030
+ # System accounts
+ SYS_GID_MIN		  101
+ SYS_GID_MAX		  999

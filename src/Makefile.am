@@ -24,7 +24,6 @@ AM_CPPFLAGS = \
 # $prefix/bin and $prefix/sbin, no install-data hacks...)
 
 bin_PROGRAMS   = groups login
-sbin_PROGRAMS  = nologin
 ubin_PROGRAMS  = faillog lastlog chage chfn chsh expiry gpasswd newgrp passwd
 if ENABLE_SUBIDS
 ubin_PROGRAMS += newgidmap newuidmap
@@ -33,6 +32,7 @@ if WITH_SU
 bin_PROGRAMS  += su
 endif
 usbin_PROGRAMS = \
+	cppw \
 	chgpasswd \
 	chpasswd \
 	groupadd \
@@ -44,6 +44,7 @@ usbin_PROGRAMS = \
 	grpunconv \
 	logoutd \
 	newusers \
+	nologin \
 	pwck \
 	pwconv \
 	pwunconv \
@@ -101,6 +102,7 @@ chfn_LDADD     = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX) $(LIBCRYPT_NOPAM) 
 chgpasswd_LDADD = $(LDADD) $(LIBPAM_SUID) $(LIBAUDIT) $(LIBSELINUX) $(LIBCRYPT) $(LIBECONF)
 chsh_LDADD     = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX) $(LIBCRYPT_NOPAM) $(LIBSKEY) $(LIBMD) $(LIBECONF)
 chpasswd_LDADD = $(LDADD) $(LIBPAM) $(LIBAUDIT) $(LIBSELINUX) $(LIBCRYPT) $(LIBECONF)
+cppw_LDADD     = $(LDADD) $(LIBSELINUX) $(LIBAUDIT)
 expiry_LDADD = $(LDADD) $(LIBECONF)
 gpasswd_LDADD  = $(LDADD) $(LIBAUDIT) $(LIBSELINUX) $(LIBCRYPT) $(LIBECONF)
 groupadd_LDADD = $(LDADD) $(LIBPAM_SUID) $(LIBAUDIT) $(LIBSELINUX) $(LIBECONF)

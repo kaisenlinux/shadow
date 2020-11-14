@@ -90,6 +90,7 @@ src/chfn.c
 src/chgpasswd.c
 src/chpasswd.c
 src/chsh.c
+src/cppw.c
 src/expiry.c
 src/faillog.c
 src/gpasswd.c

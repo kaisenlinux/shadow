@@ -44,6 +44,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <signal.h>
+#include <grp.h>
 #include "nscd.h"
 #include "sssd.h"
 #ifdef WITH_TCB
@@ -986,12 +987,23 @@ int commonio_close (struct commonio_db *db)
 			goto fail;
 		}
 	} else {
+		struct group *grp;
 		/*
 		 * Default permissions for new [g]shadow files.
 		 */
 		sb.st_mode = db->st_mode;
 		sb.st_uid = db->st_uid;
 		sb.st_gid = db->st_gid;
+
+		/*
+		 * Try to retrieve the shadow's GID, and fall back to GID 0.
+		 */
+		if (sb.st_gid == 0) {
+			if ((grp = getgrnam("shadow")) != NULL)
+				sb.st_gid = grp->gr_gid;
+			else
+				sb.st_gid = 0;
+		}
 	}
 
 	snprintf (buf, sizeof buf, "%s+", db->filename);

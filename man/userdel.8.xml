@@ -83,6 +83,12 @@
   <refsect1 id='description'>
     <title>DESCRIPTION</title>
     <para>
+      <command>userdel</command> is a low level utility for removing
+      users.  On Debian, administrators should usually use
+      <citerefentry><refentrytitle>deluser</refentrytitle>
+      <manvolnum>8</manvolnum></citerefentry> instead.
+    </para>
+    <para>
       The <command>userdel</command> command modifies the system account
       files, deleting all entries that refer to the user name <emphasis
       remap='I'>LOGIN</emphasis>. The named user must exist.

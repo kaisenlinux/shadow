@@ -107,6 +107,12 @@
   <refsect1 id='description'>
     <title>DESCRIPTION</title>
       <para>
+	<command>useradd</command> is a low level utility for adding
+	users.  On Debian, administrators should usually use
+	<citerefentry><refentrytitle>adduser</refentrytitle>
+	<manvolnum>8</manvolnum></citerefentry> instead.
+      </para>
+      <para>
 	When invoked without the <option>-D</option> option, the
 	<command>useradd</command> command creates a new user account using
 	the values specified on the command line plus the default values from
@@ -341,6 +347,11 @@
 	    databases are reset to avoid reusing the entry from a previously
 	    deleted user.
 	  </para>
+          <para>
+            For the compatibility with previous Debian's
+            <command>useradd</command>, the <option>-O</option> option is
+            also supported.
+          </para>
 	</listitem>
       </varlistentry>
       <varlistentry>
@@ -662,10 +673,18 @@
     </para>
 
     <para>
-      Usernames must start with a lower case letter or an underscore,
+      It is usually recommended to only use usernames that begin with a lower case letter or an underscore,
       followed by lower case letters, digits, underscores, or dashes.
       They can end with a dollar sign.
       In regular expression terms: [a-z_][a-z0-9_-]*[$]?
+    </para>
+    <para>
+      On Debian, the only constraints are that usernames must neither start
+      with a dash ('-') nor plus ('+') nor tilde ('~') nor contain a
+      colon (':'), a comma (','), or a whitespace (space: ' ',
+      end of line: '\n', tabulation: '\t', etc.). Note that using a slash
+      ('/') may break the default algorithm for the definition of the
+      user's home directory.
     </para>
     <para>
       Usernames may only be up to 32 characters long.

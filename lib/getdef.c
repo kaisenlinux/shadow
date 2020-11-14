@@ -60,7 +60,6 @@ struct itemdef {
 	{"ENVIRON_FILE", NULL},			\
 	{"ENV_TZ", NULL},			\
 	{"FAILLOG_ENAB", NULL},			\
-	{"FTMP_FILE", NULL},			\
 	{"ISSUE_FILE", NULL},			\
 	{"LASTLOG_ENAB", NULL},			\
 	{"LOGIN_STRING", NULL},			\
@@ -89,8 +88,9 @@ static struct itemdef def_table[] = {
 	{"ENV_PATH", NULL},
 	{"ENV_SUPATH", NULL},
 	{"ERASECHAR", NULL},
-	{"FAIL_DELAY", NULL},
+	{"FAILLOG_ENAB", NULL},
 	{"FAKE_SHELL", NULL},
+	{"FTMP_FILE", NULL},
 	{"GID_MAX", NULL},
 	{"GID_MIN", NULL},
 	{"HOME_MODE", NULL},

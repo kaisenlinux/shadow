@@ -1143,9 +1143,9 @@ static void process_flags (int argc, char **argv)
 		};
 		while ((c = getopt_long (argc, argv,
 #ifdef WITH_SELINUX
-		                         "b:c:d:De:f:g:G:hk:K:lmMNop:rR:P:s:u:UZ:",
+		                         "b:c:d:De:f:g:G:hk:O:K:lmMNop:rR:P:s:u:UZ:",
 #else				/* !WITH_SELINUX */
-		                         "b:c:d:De:f:g:G:hk:K:lmMNop:rR:P:s:u:U",
+		                         "b:c:d:De:f:g:G:hk:O:K:lmMNop:rR:P:s:u:U",
 #endif				/* !WITH_SELINUX */
 		                         long_options, NULL)) != -1) {
 			switch (c) {
@@ -1274,6 +1274,7 @@ static void process_flags (int argc, char **argv)
 				kflg = true;
 				break;
 			case 'K':
+			case 'O': /* compatibility with previous Debian useradd */
 				/*
 				 * override login.defs defaults (-K name=value)
 				 * example: -K UID_MIN=100 -K UID_MAX=499

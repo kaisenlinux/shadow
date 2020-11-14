@@ -136,9 +136,9 @@ static void update_utmp (const char *user,
 #endif
 			);
 
-#ifndef USE_PAM
 static struct faillog faillog;
 
+#ifndef USE_PAM
 static void bad_time_notify (void);
 static void check_nologin (bool login_to_root);
 #else
@@ -536,7 +536,6 @@ int main (int argc, char **argv)
 #if defined(HAVE_STRFTIME) && !defined(USE_PAM)
 	char ptime[80];
 #endif
-	unsigned int delay;
 	unsigned int retries;
 	bool subroot = false;
 #ifndef USE_PAM
@@ -561,6 +560,7 @@ int main (int argc, char **argv)
 	pid_t child;
 	char *pam_user = NULL;
 #else
+	unsigned int delay;
 	struct spwd *spwd = NULL;
 #endif
 	/*
@@ -723,7 +723,6 @@ int main (int argc, char **argv)
 	}
 
 	environ = newenvp;	/* make new environment active */
-	delay   = getdef_unum ("FAIL_DELAY", 1);
 	retries = getdef_unum ("LOGIN_RETRIES", RETRIES);
 
 #ifdef USE_PAM
@@ -739,8 +738,7 @@ int main (int argc, char **argv)
 
 	/*
 	 * hostname & tty are either set to NULL or their correct values,
-	 * depending on how much we know. We also set PAM's fail delay to
-	 * ours.
+	 * depending on how much we know.
 	 *
 	 * PAM_RHOST and PAM_TTY are used for authentication, only use
 	 * information coming from login or from the caller (e.g. no utmp)
@@ -749,10 +747,6 @@ int main (int argc, char **argv)
 	PAM_FAIL_CHECK;
 	retcode = pam_set_item (pamh, PAM_TTY, tty);
 	PAM_FAIL_CHECK;
-#ifdef HAS_PAM_FAIL_DELAY
-	retcode = pam_fail_delay (pamh, 1000000 * delay);
-	PAM_FAIL_CHECK;
-#endif
 	/* if fflg, then the user has already been authenticated */
 	if (!fflg) {
 		unsigned int failcount = 0;
@@ -793,12 +787,6 @@ int main (int argc, char **argv)
 			bool failed = false;
 
 			failcount++;
-#ifdef HAS_PAM_FAIL_DELAY
-			if (delay > 0) {
-				retcode = pam_fail_delay(pamh, 1000000*delay);
-				PAM_FAIL_CHECK;
-			}
-#endif
 
 			retcode = pam_authenticate (pamh, 0);
 
@@ -809,6 +797,9 @@ int main (int argc, char **argv)
 				SYSLOG ((LOG_NOTICE,
 				         "TOO MANY LOGIN TRIES (%u)%s FOR '%s'",
 				         failcount, fromhost, failent_user));
+				if ((NULL != pwd) && getdef_bool("FAILLOG_ENAB")) {
+					failure (pwd->pw_uid, tty, &faillog);
+				}
 				fprintf (stderr,
 				         _("Maximum number of tries exceeded (%u)\n"),
 				         failcount);
@@ -825,6 +816,14 @@ int main (int argc, char **argv)
 				         failcount, fromhost, failent_user,
 				         pam_strerror (pamh, retcode)));
 				failed = true;
+			}
+			if (   (NULL != pwd)
+			    && getdef_bool("FAILLOG_ENAB")
+			    && ! failcheck (pwd->pw_uid, &faillog, failed)) {
+				SYSLOG((LOG_CRIT,
+				        "exceeded failure limit for `%s' %s",
+				        failent_user, fromhost));
+				failed = 1;
 			}
 
 			if (!failed) {
@@ -848,6 +847,28 @@ int main (int argc, char **argv)
 
 			(void) puts ("");
 			(void) puts (_("Login incorrect"));
+
+			if ((NULL != pwd) && getdef_bool("FAILLOG_ENAB")) {
+				failure (pwd->pw_uid, tty, &faillog);
+			}
+
+			if (getdef_str("FTMP_FILE") != NULL) {
+#ifdef USE_UTMPX
+				struct utmpx *failent =
+					prepare_utmpx (failent_user,
+					               tty,
+					/* FIXME: or fromhost? */hostname,
+					               utent);
+#else				/* !USE_UTMPX */
+				struct utmp *failent =
+					prepare_utmp (failent_user,
+					              tty,
+					              hostname,
+					              utent);
+#endif				/* !USE_UTMPX */
+				failtmp (failent_user, failent);
+				free (failent);
+			}
 
 			if (failcount >= retries) {
 				SYSLOG ((LOG_NOTICE,
@@ -1088,14 +1109,17 @@ int main (int argc, char **argv)
 		free (username);
 		username = NULL;
 
+#ifndef USE_PAM
 		/*
 		 * Wait a while (a la SVR4 /usr/bin/login) before attempting
 		 * to login the user again. If the earlier alarm occurs
 		 * before the sleep() below completes, login will exit.
 		 */
+		delay = getdef_unum ("FAIL_DELAY", 1);
 		if (delay > 0) {
 			(void) sleep (delay);
 		}
+#endif
 
 		(void) puts (_("Login incorrect"));
 
@@ -1287,6 +1311,7 @@ int main (int argc, char **argv)
 		 */
 #ifndef USE_PAM
 		motd ();	/* print the message of the day */
+#endif
 		if (   getdef_bool ("FAILLOG_ENAB")
 		    && (0 != faillog.fail_cnt)) {
 			failprint (&faillog);
@@ -1299,6 +1324,7 @@ int main (int argc, char **argv)
 				         username, (int) faillog.fail_cnt));
 			}
 		}
+#ifndef USE_PAM
 		if (   getdef_bool ("LASTLOG_ENAB")
 		    && pwd->pw_uid <= (uid_t) getdef_ulong ("LASTLOG_UID_MAX", 0xFFFFFFFFUL)
 		    && (ll.ll_time != 0)) {
